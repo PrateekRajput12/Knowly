@@ -22,6 +22,16 @@ app.use(
   })
 );
 
+// app.use(
+//   cors({
+//     origin: "http://localhost:5173",
+//     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+//     credentials: true,
+//   })
+// );
+
+app.options("*", cors()); // allow preflight for all routes
+
 app.use(express.json());
 app.use(cookieParser());
 

@@ -114,6 +114,61 @@ export async function acceptFriendRequest(req, res) {
   }
 }
 
+// export async function acceptFriendRequest(req, res) {
+//   const session = await mongoose.startSession();
+//   session.startTransaction();
+
+//   try {
+//     const { id: requestId } = req.params;
+
+//     const friendRequest = await FriendRequest.findById(requestId).session(session);
+
+//     if (!friendRequest) {
+//       return res.status(404).json({ message: "Friend request not found" });
+//     }
+
+//     // Verify the current user is the recipient
+//     if (friendRequest.recipient.toString() !== req.user.id) {
+//       return res.status(403).json({ message: "You are not authorized to accept this request" });
+//     }
+
+//     // Prevent duplicate acceptance
+//     if (friendRequest.status === "accepted") {
+//       return res.status(400).json({ message: "Friend request already accepted" });
+//     }
+//     if (friendRequest.status === "rejected") {
+//       return res.status(400).json({ message: "Friend request was already rejected" });
+//     }
+
+//     friendRequest.status = "accepted";
+//     await friendRequest.save({ session });
+
+//     // Add each user to the other's friends array
+//     await User.findByIdAndUpdate(
+//       friendRequest.sender,
+//       { $addToSet: { friends: friendRequest.recipient } },
+//       { session }
+//     );
+
+//     await User.findByIdAndUpdate(
+//       friendRequest.recipient,
+//       { $addToSet: { friends: friendRequest.sender } },
+//       { session }
+//     );
+
+//     await session.commitTransaction();
+//     session.endSession();
+
+//     res.status(200).json({ message: "Friend request accepted successfully" });
+//   } catch (error) {
+//     await session.abortTransaction();
+//     session.endSession();
+
+//     console.error("Error in acceptFriendRequest controller:", error.message);
+//     res.status(500).json({ message: "Internal Server Error" });
+//   }
+// }
+
 export async function getFriendRequests(req, res) {
   try {
     const incomingReqs = await FriendRequest.find({
