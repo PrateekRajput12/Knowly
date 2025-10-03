@@ -34,18 +34,17 @@ app.use(express.json());
 app.use(cookieParser());
 const __dirname = path.resolve();
 
+app.use('/uploads', express.static("uploads"))
 
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/chat", chatRoutes);
 
-if (process.env.NODE_ENV === "production") {
-  app.use(express.static(path.join(__dirname, "../frontend/dist")));
+app.use(express.static(path.join(__dirname, "frontend", "dist")))
 
-  app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "../frontend", "dist", "index.html"));
-  });
-}
+app.use((req, res) => {
+  res.sendFile(path.join(__dirname, "frontend", "dist", "index.html"))
+})
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
