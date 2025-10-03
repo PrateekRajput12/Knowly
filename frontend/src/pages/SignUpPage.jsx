@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ShipWheelIcon } from "lucide-react";
-import { Link } from "react-router-dom"; // ✅ Fixed import
+import { Link } from "react-router";
+
 import useSignUp from "../hooks/useSignUp";
 
 const SignUpPage = () => {
@@ -10,20 +11,22 @@ const SignUpPage = () => {
     password: "",
   });
 
-  const { isPending, error, signupMutation } = useSignUp();
+  // This is how we did it at first, without using our custom hook
+  // const queryClient = useQueryClient();
+  // const {
+  //   mutate: signupMutation,
+  //   isPending,
+  //   error,
+  // } = useMutation({
+  //   mutationFn: signup,
+  //   onSuccess: () => queryClient.invalidateQueries({ queryKey: ["authUser"] }),
+  // });
 
-  const handleChange = (e) => {
-    setSignupData((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
-  };
+  // This is how we did it using our custom hook - optimized version
+  const { isPending, error, signupMutation } = useSignUp();
 
   const handleSignup = (e) => {
     e.preventDefault();
-    if (signupData.password.length < 6) {
-      return alert("Password must be at least 6 characters long");
-    }
     signupMutation(signupData);
   };
 
@@ -46,7 +49,7 @@ const SignUpPage = () => {
           {/* ERROR MESSAGE IF ANY */}
           {error && (
             <div className="alert alert-error mb-4">
-              <span>{error?.response?.data?.message || "Something went wrong"}</span>
+              <span>{error.response.data.message}</span>
             </div>
           )}
 
@@ -68,12 +71,10 @@ const SignUpPage = () => {
                     </label>
                     <input
                       type="text"
-                      name="fullName"
                       placeholder="John Doe"
                       className="input input-bordered w-full"
                       value={signupData.fullName}
-                      onChange={handleChange}
-                      disabled={isPending}
+                      onChange={(e) => setSignupData({ ...signupData, fullName: e.target.value })}
                       required
                     />
                   </div>
@@ -84,12 +85,10 @@ const SignUpPage = () => {
                     </label>
                     <input
                       type="email"
-                      name="email"
                       placeholder="john@gmail.com"
                       className="input input-bordered w-full"
                       value={signupData.email}
-                      onChange={handleChange}
-                      disabled={isPending}
+                      onChange={(e) => setSignupData({ ...signupData, email: e.target.value })}
                       required
                     />
                   </div>
@@ -100,12 +99,10 @@ const SignUpPage = () => {
                     </label>
                     <input
                       type="password"
-                      name="password"
                       placeholder="********"
                       className="input input-bordered w-full"
                       value={signupData.password}
-                      onChange={handleChange}
-                      disabled={isPending}
+                      onChange={(e) => setSignupData({ ...signupData, password: e.target.value })}
                       required
                     />
                     <p className="text-xs opacity-70 mt-1">
@@ -125,11 +122,7 @@ const SignUpPage = () => {
                   </div>
                 </div>
 
-                <button
-                  className="btn btn-primary w-full"
-                  type="submit"
-                  disabled={isPending}
-                >
+                <button className="btn btn-primary w-full" type="submit">
                   {isPending ? (
                     <>
                       <span className="loading loading-spinner loading-xs"></span>

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ShipWheelIcon } from "lucide-react";
-import { Link } from "react-router-dom"; // ✅ fixed import
+import { Link } from "react-router";
 import useLogin from "../hooks/useLogin";
 
 const LoginPage = () => {
@@ -9,14 +9,19 @@ const LoginPage = () => {
     password: "",
   });
 
-  const { isPending, error, loginMutation } = useLogin();
+  // This is how we did it at first, without using our custom hook
+  // const queryClient = useQueryClient();
+  // const {
+  //   mutate: loginMutation,
+  //   isPending,
+  //   error,
+  // } = useMutation({
+  //   mutationFn: login,
+  //   onSuccess: () => queryClient.invalidateQueries({ queryKey: ["authUser"] }),
+  // });
 
-  const handleChange = (e) => {
-    setLoginData((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
-  };
+  // This is how we did it using our custom hook - optimized version
+  const { isPending, error, loginMutation } = useLogin();
 
   const handleLogin = (e) => {
     e.preventDefault();
@@ -34,7 +39,7 @@ const LoginPage = () => {
           {/* LOGO */}
           <div className="mb-4 flex items-center justify-start gap-2">
             <ShipWheelIcon className="size-9 text-primary" />
-            <span className="text-3xl font-bold font-mono bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary tracking-wider">
+            <span className="text-3xl font-bold font-mono bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary  tracking-wider">
               Streamify
             </span>
           </div>
@@ -42,7 +47,7 @@ const LoginPage = () => {
           {/* ERROR MESSAGE DISPLAY */}
           {error && (
             <div className="alert alert-error mb-4">
-              <span>{error?.response?.data?.message || "Something went wrong"}</span>
+              <span>{error.response.data.message}</span>
             </div>
           )}
 
@@ -57,41 +62,34 @@ const LoginPage = () => {
                 </div>
 
                 <div className="flex flex-col gap-3">
-                  {/* EMAIL */}
                   <div className="form-control w-full space-y-2">
                     <label className="label">
                       <span className="label-text">Email</span>
                     </label>
                     <input
                       type="email"
-                      name="email"
                       placeholder="hello@example.com"
                       className="input input-bordered w-full"
                       value={loginData.email}
-                      onChange={handleChange}
-                      disabled={isPending}
+                      onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
                       required
                     />
                   </div>
 
-                  {/* PASSWORD */}
                   <div className="form-control w-full space-y-2">
                     <label className="label">
                       <span className="label-text">Password</span>
                     </label>
                     <input
                       type="password"
-                      name="password"
                       placeholder="••••••••"
                       className="input input-bordered w-full"
                       value={loginData.password}
-                      onChange={handleChange}
-                      disabled={isPending}
+                      onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
                       required
                     />
                   </div>
 
-                  {/* SUBMIT */}
                   <button type="submit" className="btn btn-primary w-full" disabled={isPending}>
                     {isPending ? (
                       <>
@@ -103,7 +101,6 @@ const LoginPage = () => {
                     )}
                   </button>
 
-                  {/* NAVIGATION */}
                   <div className="text-center mt-4">
                     <p className="text-sm">
                       Don't have an account?{" "}
@@ -121,6 +118,7 @@ const LoginPage = () => {
         {/* IMAGE SECTION */}
         <div className="hidden lg:flex w-full lg:w-1/2 bg-primary/10 items-center justify-center">
           <div className="max-w-md p-8">
+            {/* Illustration */}
             <div className="relative aspect-square max-w-sm mx-auto">
               <img src="/i.png" alt="Language connection illustration" className="w-full h-full" />
             </div>
@@ -137,5 +135,4 @@ const LoginPage = () => {
     </div>
   );
 };
-
 export default LoginPage;
