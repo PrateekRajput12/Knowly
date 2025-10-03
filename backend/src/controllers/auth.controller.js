@@ -35,6 +35,7 @@ export async function signup(req, res) {
       profilePic: randomAvatar,
     });
 
+    console.log("new user created");
     try {
       await upsertStreamUser({
         id: newUser._id.toString(),
