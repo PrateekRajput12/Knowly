@@ -16,7 +16,7 @@ const PORT = process.env.PORT;
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: "https://knowly-8.onrender.com",
     credentials: true, // allow frontend to send cookies
   })
 );
